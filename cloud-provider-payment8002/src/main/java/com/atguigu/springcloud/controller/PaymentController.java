@@ -3,6 +3,7 @@ package com.atguigu.springcloud.controller;
 import com.atguigu.springcloud.entities.CommonResult;
 import com.atguigu.springcloud.entities.Payment;
 import com.atguigu.springcloud.service.PaymentService;
+import com.netflix.discovery.converters.Auto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,17 +56,17 @@ public class PaymentController {
         }
     }
 
-
     @GetMapping("/payment/discovery")
-    public Object discovery(){
+    public Object getDiscovery(){
         List<String> services = discoveryClient.getServices();
         for (String service : services) {
-            log.info("*************"+service);
+            System.out.println(service);
+            List<ServiceInstance> instances = discoveryClient.getInstances(service);
+            for (ServiceInstance instance : instances) {
+                System.out.println("##########"+instance.getServiceId()+"\t"+instance.getPort()+"\t"+instance.getUri());
+            }
         }
-        List<ServiceInstance> instances = discoveryClient.getInstances("CLOUD-PAYMENT-SERVICE");
-        for (ServiceInstance instance : instances) {
-            log.info("##################"+instance.getServiceId()+"\t"+instance.getPort()+"\t"+instance.getUri());
-        }
-        return this.discoveryClient;
+        return discoveryClient;
     }
+
 }
